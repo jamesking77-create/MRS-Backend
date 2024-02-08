@@ -1,11 +1,16 @@
 from flask import Flask, jsonify, request
+import os
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
 app = Flask(__name__)
 
-df = pd.read_csv(r'C:\Users\USER\Desktop\movie_recommendation_system\data_set\movies.csv')
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+csv_file_path = os.path.join(current_dir, 'data_set', 'movies.csv')
+
+df = pd.read_csv(csv_file_path)
 tfidf = TfidfVectorizer(stop_words='english')
 df['overview'] = df['overview'].fillna('')
 tfidf_matrix = tfidf.fit_transform(df['overview'])
