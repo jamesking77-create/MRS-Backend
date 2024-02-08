@@ -20,7 +20,7 @@ tfidf_matrix = tfidf.fit_transform(df['overview'])
 
 @app.route('/home')
 def home():
-    return jsonify({'message': 'Welcome to the Home Page!'})
+    return jsonify({'message': 'Welcome to the Home Page oooooo!'})
 
 
 @app.route('/display_movies', methods=['GET'])
