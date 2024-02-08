@@ -1,10 +1,12 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 import os
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
 app = Flask(__name__)
+CORS(app, origins='*')
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
