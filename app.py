@@ -31,7 +31,7 @@ def create_test_data():
 
 @app.route('/home')
 def home():
-    return jsonify({'message': 'Welcome to the Home Page!'})
+    return jsonify({'message': 'Welcome to the Home Page bro!'})
 
 
 @app.route('/display_movies', methods=['GET'])
