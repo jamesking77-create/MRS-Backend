@@ -31,7 +31,7 @@ def create_test_data():
 
 @app.route('/home')
 def home():
-    return jsonify({'message': 'Welcome to the Home Page bro!'})
+    return jsonify({'message': 'Welcome to the Home Page my brooo!'})
 
 
 @app.route('/update_rating', methods=['POST'])
@@ -99,11 +99,9 @@ def search_movies():
                 lambda x: any(query.lower() in company['name'].lower() for company in eval(x)))
             ]
 
-        # Modify the vote_average by dividing it by 2
         selected_movies = matching_movies[['id', 'title', 'vote_average']]
         selected_movies['vote_average'] = selected_movies['vote_average'] / 2
 
-        # Convert DataFrame to dictionary
         selected_movies = selected_movies.to_dict(orient='records')
 
         return jsonify({"matching_movies": selected_movies})
@@ -134,10 +132,9 @@ def search_credits():
 @app.route('/evaluate_recommendations', methods=['GET'])
 def evaluate_recommendations():
     try:
-        # Step 1: Split the data into training and test sets
+
         train_data, test_data = train_test_split(movies_df, test_size=0.2, random_state=42)
 
-        # Step 2: Generate recommendations for the test set
         recommendations = {}
         for index, row in test_data.iterrows():
             selected_movie_title = row['title'].lower()
@@ -149,9 +146,8 @@ def evaluate_recommendations():
             recommended_movies = movies_df.iloc[similar_movie_indices][['id', 'title']].to_dict(orient='records')
             recommendations[row['id']] = [movie['id'] for movie in recommended_movies]
 
-        print("Recommendations:", recommendations)  # Add this line to print recommendations
+        print("Recommendations:", recommendations)
 
-        # Step 3: Evaluate the recommendations using Mean Average Precision (MAP)
         average_precision = 0
         num_evaluated = 0
 
