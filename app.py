@@ -34,6 +34,27 @@ def home():
     return jsonify({'message': 'Welcome to the Home Page bro!'})
 
 
+@app.route('/update_rating', methods=['POST'])
+def update_rating():
+    try:
+        data = request.json
+        movie_id = data.get('id')
+        rating = data.get('rating')
+
+        if movie_id is None or rating is None:
+            return jsonify({"error": "Please provide both movie ID and rating"}), 400
+        if movie_id not in movies_df['id'].values:
+            return jsonify({"error": "Movie not found in the dataset"}), 404
+        movies_df.loc[movies_df['id'] == movie_id, 'vote_average'] = rating
+        movies_df.to_csv(movies_csv_path, index=False)
+
+        return jsonify({"message": f"Rating for movie with ID {movie_id} updated successfully"}), 200
+
+    except Exception as e:
+        print("Error:", e)
+        return jsonify({"error": "An error occurred while updating rating"}), 500
+
+
 @app.route('/display_movies', methods=['GET'])
 def get_movies():
     try:
@@ -56,7 +77,10 @@ def recommend_movies():
         cosine_similarities = linear_kernel(selected_movie_vector, tfidf_matrix).flatten()
         similar_movie_indices = cosine_similarities.argsort()[:-11:-1]
         similar_movie_indices = [idx for idx in similar_movie_indices if idx != selected_movie_index]
-        recommended_movies = movies_df.iloc[similar_movie_indices][['id', 'title']].to_dict(orient='records')
+        recommended_movies = movies_df.iloc[similar_movie_indices][['id', 'title', 'vote_average']]
+        recommended_movies['vote_average'] = recommended_movies['vote_average'] / 2
+        recommended_movies = recommended_movies.to_dict(orient='records')
+
         return jsonify({"recommended_movies": recommended_movies})
     except Exception as e:
         print("Error:", e)
@@ -74,7 +98,14 @@ def search_movies():
             movies_df['production_companies'].apply(
                 lambda x: any(query.lower() in company['name'].lower() for company in eval(x)))
             ]
-        selected_movies = matching_movies[['id', 'title']].to_dict(orient='records')
+
+        # Modify the vote_average by dividing it by 2
+        selected_movies = matching_movies[['id', 'title', 'vote_average']]
+        selected_movies['vote_average'] = selected_movies['vote_average'] / 2
+
+        # Convert DataFrame to dictionary
+        selected_movies = selected_movies.to_dict(orient='records')
+
         return jsonify({"matching_movies": selected_movies})
     except Exception as e:
         print("Error:", e)
